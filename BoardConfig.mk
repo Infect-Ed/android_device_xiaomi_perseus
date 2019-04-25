@@ -12,6 +12,9 @@ DEVICE_PATH := device/xiaomi/perseus
 # Assert
 TARGET_OTA_ASSERT_DEVICE := perseus
 
+# Camera
+TARGET_USES_ION := tru
+
 # Kernel
 BOARD_KERNEL_SEPARATED_DTBO := true
 TARGET_KERNEL_CONFIG := perseus_defconfig

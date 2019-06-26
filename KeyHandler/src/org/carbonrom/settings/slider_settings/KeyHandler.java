@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.lineageos.settings.device;
+package org.carbonrom.settings.slider_settings;
 
+import android.content.BroadcastReceiver;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -32,6 +33,8 @@ import com.android.internal.os.DeviceKeyHandler;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.carbonrom.settings.slider_settings.Constants;
 
 import static android.view.KeyEvent.ACTION_DOWN;
 
@@ -51,6 +54,10 @@ public class KeyHandler extends CameraManager.AvailabilityCallback
 
     public KeyHandler(Context context) {
         mContext = context;
+
+        IntentFilter camerSliderFilter =
+                new IntentFilter(Constants.CAMERA_SLIDER_INTENT);
+        mContext.registerReceiver(mCameraSliderReceiver, cameraSliderFilter);
 
         mVibrator = mContext.getSystemService(Vibrator.class);
         mCameraManager = mContext.getSystemService(CameraManager.class);
@@ -113,9 +120,16 @@ public class KeyHandler extends CameraManager.AvailabilityCallback
         return null;
     }
 
-    boolean isUserSetupComplete() {
-        return Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                Settings.Secure.USER_SETUP_COMPLETE, 0, UserHandle.USER_CURRENT) != 0;
+    private boolean hasSetupCompleted() {
+        return Settings.Secure.getInt(mContext.getContentResolver(),
+                Settings.Secure.USER_SETUP_COMPLETE, 0) != 0;
+    }
+
+    private BroadcastReceiver mCameraSliderReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mCameraSliderEnabled =
+                    intent.getBooleanExtra(Constants.CAMERA_SLIDER_INTENT_ENABLED, false);
     }
 
     private void startActivityAsUser(Intent intent, UserHandle handle) {
